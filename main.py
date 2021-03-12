@@ -1,4 +1,4 @@
-import feedparser, dateparser, os, os.path, json, tweepy 
+import feedparser, dateparser, os, os.path, json, tweepy
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 
@@ -38,7 +38,22 @@ def get_last_post_timestamp() -> int:
 all_articles = feedparser.parse(os.getenv("rss_url"))
 last_post_timestamp = get_last_post_timestamp()
 
-# loop every article
+#
+#       TWITTER API AUTHENTIFICATION!
+#
+
+# authentication of consumer key and secret
+auth = tweepy.OAuthHandler(os.getenv("twitter_consumer_key"), os.getenv("twitter_consumer_secret"))
+
+# authentication of access token and secret
+auth.set_access_token(os.getenv("twitter_access_token"), os.getenv("twitter_access_token_secret"))
+api = tweepy.API(auth)
+
+
+#
+#       loop every article
+#
+
 for article in all_articles["entries"]:
 
     # fetch article data
@@ -50,5 +65,8 @@ for article in all_articles["entries"]:
     if last_post_timestamp > article_timestamp:
         break
 
-    # print article to console
-    print("- ", article_timestamp, " ", article_name, " ", article_link)
+
+
+    # send tweet
+    api.update_status(status="Neuer Blogartikel:\n"+article_link)
+    print("Neuer Blogartikel:\n"+article_link)
