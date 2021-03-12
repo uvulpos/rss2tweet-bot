@@ -59,14 +59,15 @@ for article in all_articles["entries"]:
     # fetch article data
     article_name = article["title"]
     article_link = article["link"]
+    article_author = article["author"]
     article_timestamp = int(dateparser.parse(article["published"]).timestamp())
 
     # if article is older than last post -> exit process
     if last_post_timestamp > article_timestamp:
         break
 
-
-
-    # send tweet
-    api.update_status(status="Neuer Blogartikel:\n"+article_link)
-    print("Neuer Blogartikel:\n"+article_link)
+    # author contains name
+    if article_author.__contains__(os.getenv("author_contains")):
+        # send tweet
+        api.update_status(status="Neuer Blogartikel:\n"+article_link)
+        print("Neuer Blogartikel:\n"+article_link)
